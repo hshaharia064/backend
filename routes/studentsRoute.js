@@ -35,7 +35,14 @@ const upload = multer({
 
 studentRouter.get("/", async (req, res) => {
   try {
-    const students = await Student.find();
+    const search = req.query.search || "";
+    const query = {
+      $or: [
+        { first_name: { $regex: search, $options: "i" } },
+        { last_name: { $regex: search, $options: "i" } },
+      ],
+    };
+    const students = await Student.find(query);
     res.status(200).json(students);
   } catch (err) {
     res.status(500).json({ message: "Internal server error" });
@@ -79,7 +86,7 @@ studentRouter.put("/:id", upload.single("profile_pic"), async (req, res) => {
     const existingStudent = await Student.findById(req.params.id);
     if (!existingStudent) {
       if (req.file.filename) {
-        const filepath = path.join("./uploads", filepath);
+        const filepath = path.join("./uploads", req.file.filename);
         fs.unlink(filepath, (err) =>
           console.log("Could not delete the req image", err),
         );
