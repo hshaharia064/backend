@@ -80,14 +80,23 @@ studentRouter.get("/:id", async (req, res) => {
 studentRouter.post("/", upload.single("profile_pic"), async (req, res) => {
   try {
     // const newStudent = await Student.create(req.body);
+    const { first_name, last_name, email, phone, gender } = req.body;
+    // if (req.file) {
+    // student.profile_pic = req.file.filename;
+    const imageURL = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+    // }
+    const student = new Student({
+      first_name,
+      last_name,
+      email,
+      phone,
+      gender,
+      profile_pic: imageURL,
+    });
 
-    const student = new Student(req.body);
-    if (req.file) {
-      student.profile_pic = req.file.filename;
-    }
     const newStudent = await student.save();
 
-    res.status(201).json({ message: "New student added" });
+    res.status(201).json({ newStudent });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
