@@ -14,7 +14,7 @@ userRouter.post("/register", async (req, res) => {
     if (!username || !email || !password)
       return res
         .status(401)
-        .json({ message: "You did not fill all the credentials" });
+        .json({ message: "Please fill all the credentials" });
 
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser) {
